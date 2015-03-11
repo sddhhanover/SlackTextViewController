@@ -30,7 +30,7 @@ typedef struct RGBAPixel {
 
 @interface FBSnapshotTestController ()
 
-@property (readonly, nonatomic, copy) NSString *testName;
+@property (readonly, nonatomic, retain) Class testClass;
 
 @end
 
@@ -44,16 +44,11 @@ typedef struct RGBAPixel {
 
 - (id)initWithTestClass:(Class)testClass;
 {
-    return [self initWithTestName:NSStringFromClass(testClass)];
-}
-
-- (id)initWithTestName:(NSString *)testName
-{
-    if ((self = [super init])) {
-        _testName = [testName copy];
-        _fileManager = [[NSFileManager alloc] init];
-    }
-    return self;
+  if ((self = [super init])) {
+    _testClass = testClass;
+    _fileManager = [[NSFileManager alloc] init];
+  }
+  return self;
 }
 
 #pragma mark -
@@ -256,7 +251,7 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
   NSString *fileName = [self _fileNameForSelector:selector
                                        identifier:identifier
                                      fileNameType:FBTestSnapshotFileNameTypeReference];
-  NSString *filePath = [_referenceImagesDirectory stringByAppendingPathComponent:_testName];
+  NSString *filePath = [_referenceImagesDirectory stringByAppendingPathComponent:NSStringFromClass(_testClass)];
   filePath = [filePath stringByAppendingPathComponent:fileName];
   return filePath;
 }
@@ -272,7 +267,7 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
   if (getenv("IMAGE_DIFF_DIR")) {
     folderPath = @(getenv("IMAGE_DIFF_DIR"));
   }
-  NSString *filePath = [folderPath stringByAppendingPathComponent:_testName];
+  NSString *filePath = [folderPath stringByAppendingPathComponent:NSStringFromClass(_testClass)];
   filePath = [filePath stringByAppendingPathComponent:fileName];
   return filePath;
 }
